@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Santa's List - Holiday Gift Pairer</title>
+  <style>
+    :root {
+      --bg-dark: #091e16;
+      --bg-light: #133829;
+      --crimson: #b91c1c;
+      --crimson-dark: #7f1d1d;
+      --crimson-light: #dc2626;
+      --gold: #d4af37;
+      --card-bg: #ffffff;
+      --lid-bg: #fcfdfc;
+      --surface: #f8fafc;
+      --border: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+      background: radial-gradient(circle at top, var(--bg-light) 0%, var(--bg-dark) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 70px 20px 40px 20px;
+      box-sizing: border-box;
+    }
+
+    .gift-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .svg-bow {
+      position: absolute;
+      top: -46px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 54px;
+      z-index: 3;
+      filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35));
+      pointer-events: none;
+    }
+
+    .gift-lid {
+      position: relative;
+      background: var(--lid-bg);
+      margin: 0 -10px;
+      padding: 28px 24px 22px 24px;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 4px 10px -2px rgba(0, 0, 0, 0.15);
+      z-index: 2;
+      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    .gift-lid::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      background: linear-gradient(90deg, var(--crimson-dark), var(--crimson), var(--crimson-dark));
+      opacity: 0.92;
+      z-index: 0;
+    }
+
+    .gift-lid::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      border-left: 1px solid var(--gold);
+      border-right: 1px solid var(--gold);
+      z-index: 0;
+    }
+
+    .lid-text {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(4px);
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--bg-dark);
+    }
+
+    .gift-base {
+      position: relative;
+      background: var(--card-bg);
+      padding: 28px 28px 32px 28px;
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    .gift-base::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0) 100%);
+      pointer-events: none;
+    }
+
+    .subtitle {
+      margin: 0 0 16px 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 240px;
+      padding: 14px 16px;
+      font-size: 15px;
+      line-height: 1.5;
+      font-family: inherit;
+      color: var(--text-primary);
+      background-color: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+      resize: vertical;
+      transition: all 0.2s ease;
+    }
+
+    textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    textarea:focus {
+      outline: none;
+      background-color: #ffffff;
+      border-color: var(--bg-light);
+      box-shadow: 0 0 0 3px rgba(19, 56, 41, 0.12);
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(180deg, var(--crimson-light) 0%, var(--crimson) 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(185, 28, 28, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(185, 28, 28, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .copy-btn {
+      display: none;
+      margin-top: 14px;
+      background: var(--surface);
+      color: var(--bg-light);
+      border: 1.5px solid var(--bg-light);
+      box-shadow: none;
+      padding: 11px 16px;
+      font-size: 14px;
+    }
+
+    .copy-btn:hover {
+      background: rgba(19, 56, 41, 0.06);
+      filter: none;
+      box-shadow: none;
+    }
+
+    .copy-btn.copied {
+      background: var(--bg-light);
+      color: #ffffff;
+    }
+
+    .error {
+      color: var(--crimson);
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-top: 16px;
+      font-size: 13.5px;
+      font-weight: 500;
+      text-align: center;
+      display: none;
+    }
+
+    .error.visible {
+      display: block;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 22px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    li {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      animation: fadeIn 0.25s ease forwards;
+    }
+
+    li span:first-child {
+      text-align: left;
+    }
+
+    li span:last-child {
+      text-align: right;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .buys-for {
+      color: var(--bg-light);
+      font-size: 12.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      text-align: center;
+      background: rgba(0, 28, 28, 0.08);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="gift-wrapper">
+    <svg class="svg-bow" viewBox="0 0 140 54" fill="none" xmlns="http://w3.org">
+      <path d="M58 34 L34 52 L44 48 L48 54 L66 36 Z" fill="#7f1d1d"/>
+      <path d="M82 34 L106 52 L96 48 L92 54 L74 36 Z" fill="#7f1d1d"/>
+      <path d="M68 28 C46 4, 12 8, 16 28 C19 42, 48 38, 68 31 Z" fill="url(#bowGradLeft)" stroke="#d4af37" stroke-width="1"/>
+      <path d="M72 28 C94 4, 128 8, 124 28 C121 42, 92 38, 72 31 Z" fill="url(#bowGradRight)" stroke="#d4af37" stroke-width="1"/>
+      <path d="M66 29 C50 18, 32 20, 34 28 C35 33, 52 32, 66 30 Z" fill="#7f1d1d" opacity="0.65"/>
+      <path d="M74 29 C90 18, 108 20, 106 28 C105 33, 88 32, 74 30 Z" fill="#7f1d1d" opacity="0.65"/>
+      <rect x="61" y="20" width="18" height="17" rx="5" fill="url(#knotGrad)" stroke="#d4af37" stroke-width="1.2"/>
+      <defs>
+        <linearGradient id="bowGradLeft" x1="16" y1="10" x2="68" y2="35" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#dc2626"/>
+          <stop offset="1" stop-color="#991b1b"/>
+        </linearGradient>
+        <linearGradient id="bowGradRight" x1="124" y1="10" x2="72" y2="35" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#dc2626"/>
+          <stop offset="1" stop-color="#991b1b"/>
+        </linearGradient>
+        <linearGradient id="knotGrad" x1="61" y1="20" x2="79" y2="37" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#ef4444"/>
+          <stop offset="1" stop-color="#991b1b"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="gift-lid">
+      <div class="lid-text">
+        <h2>Santa's List - Holiday Gift Pairer</h2>
+      </div>
+    </div>
+
+    <div class="gift-base">
+      <p class="subtitle">Enter one name per line below:</p>
+      <textarea id="itemInput" placeholder="Dasher&#10;Dancer&#10;Prancer&#10;Vixen&#10;Comet&#10;Cupid&#10;Donner&#10;Blitzen&#10;Rudolph"></textarea>
+        <button id="submitBtn">Generate Matches</button>
+        
+      <div id="errorMessage" class="error"></div>
+      <ul id="resultsList"></ul>
+      <button id="copyBtn" class="copy-btn">Copy Results</button>
+    </div>
+  </div>
+
+  <script>
+    let generatedLines = [];
+
+    document.getElementById('submitBtn').addEventListener('click', function() {
+      const rawText = document.getElementById('itemInput').value;
+      const errorDiv = document.getElementById('errorMessage');
+      const resultsList = document.getElementById('resultsList');
+      const copyBtn = document.getElementById('copyBtn');
+      
+      errorDiv.textContent = '';
+      errorDiv.classList.remove('visible');
+      resultsList.innerHTML = '';
+      copyBtn.style.display = 'none';
+      copyBtn.textContent = 'Copy Results';
+      copyBtn.classList.remove('copied');
+      generatedLines = [];
+
+      const items = rawText
+        .split('\n')
+        .map(item => item.trim())
+        .filter(item => item !== '');
+
+      const uniqueItems = new Set(items);
+      if (uniqueItems.size !== items.length) {
+        errorDiv.textContent = 'Please make sure all names are unique.';
+        errorDiv.classList.add('visible');
+        return;
+      }
+
+      if (items.length < 2) {
+        errorDiv.textContent = 'Please enter at least 2 items to pair.';
+        errorDiv.classList.add('visible');
+        return;
+      }
+
+      let duplicated = [...items];
+      let isValid = false;
+
+      while (!isValid) {
+        for (let i = duplicated.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [duplicated[i], duplicated[j]] = [duplicated[j], duplicated[i]];
+        }
+        isValid = items.every((item, index) => item !== duplicated[index]);
+      }
+
+      items.forEach((originalItem, index) => {
+        const li = document.createElement('li');
+        
+        const leftSpan = document.createElement('span');
+        leftSpan.textContent = originalItem;
+
+        const middleSpan = document.createElement('span');
+        middleSpan.className = 'buys-for';
+        middleSpan.textContent = 'buys for';
+
+        const rightSpan = document.createElement('span');
+        rightSpan.textContent = duplicated[index];
+
+        li.appendChild(leftSpan);
+        li.appendChild(middleSpan);
+        li.appendChild(rightSpan);
+        resultsList.appendChild(li);
+
+        generatedLines.push(`${originalItem} buys for ${duplicated[index]}`);
+      });
+
+      copyBtn.style.display = 'block';
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', function() {
+      const copyBtn = this;
+      const textToCopy = generatedLines.join('\n');
+
+      navigator.clipboard.writeText(textToCopy).then(function() {
+        copyBtn.textContent = 'Copied to Clipboard!';
+        copyBtn.classList.add('copied');
+
+        setTimeout(function() {
+          copyBtn.textContent = 'Copy Results';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  </script>
+
+</body>
+</html>
